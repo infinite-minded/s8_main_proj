@@ -33,6 +33,7 @@ def create_user_view(request):
         {
             "message": "Account created",
             "email": user.email,
+            "full_name": user.full_name,
         },
         status=status.HTTP_201_CREATED
     )
@@ -51,6 +52,7 @@ def login_view(request):
                 'token': token.key,
                 'user_id': user.pk,
                 'email': user.email,
+                "full_name": user.full_name,
             },
             status=status.HTTP_200_OK
         )
