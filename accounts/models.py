@@ -59,3 +59,17 @@ class User(AbstractUser):
     #         return profile
     #     except ObjectDoesNotExist:
     #         return None
+
+class EmergencyContact(models.Model):
+    user = models.ForeignKey(to=User, related_name='emergency_contacts', on_delete=models.CASCADE)
+    name = models.CharField(max_length=65, blank=False, null=True)
+    number = models.CharField(max_length=10, blank=False, null=True)
+
+    def __str__(self):
+        return self.number
+
+#How to retrieve phone number from user object?
+#user = User.objects.get(email='')
+#emergency_contacts = user.emergency_contacts.all()
+#for phone in emergency_contacts:
+#   print(phone.number)

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 
-from accounts.models import User
+from accounts.models import User, EmergencyContact
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,3 +56,16 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg, code='authorization')
         attrs['user'] = user
         return attrs
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmergencyContact
+        fields = ['name', 'number']
+        extra_kwargs = {
+            'name': {
+                'required': True
+            },
+            'number': {
+                'required': True
+            },
+        }
