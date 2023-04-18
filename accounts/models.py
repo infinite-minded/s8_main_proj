@@ -61,7 +61,7 @@ class User(AbstractUser):
     #         return None
 
 class EmergencyContact(models.Model):
-    user = models.ForeignKey(to=User, related_name='emergency_contacts', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='emergency_contacts', on_delete=models.CASCADE)
     name = models.CharField(max_length=65, blank=False, null=True)
     number = models.CharField(max_length=10, blank=False, null=True)
 
