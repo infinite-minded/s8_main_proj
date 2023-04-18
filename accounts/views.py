@@ -75,6 +75,7 @@ class ContactModify(APIView):
             name = serializer.validated_data.get("name")
             number = serializer.validated_data.get("number")
             e = EmergencyContact(user=user, name=name, number=number)
+            print(user.email)
             e.save()
             return Response({"message": "Contact added"}, status=status.HTTP_200_OK)
         else:
@@ -85,7 +86,7 @@ class ContactModify(APIView):
             user=request.user
         except ObjectDoesNotExist:
             return Response({"message": "User profile does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        emergency_contacts = user.emergency_contacts.all()
+        emergency_contacts = EmergencyContact.objects.filter(user=user)
         contact_list = []
         for phone in emergency_contacts:
             contact_list.append(phone.number)
