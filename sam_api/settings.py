@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 import os
 import dj_database_url
 
+PROD = True
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,6 +33,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
 
 ALLOWED_HOSTS = ['*']
+
+if PROD==False:
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    SECRET_KEY = 'django-insecure-ooqlli1xn$eoo4t3glyx&wrb5_bwbzrfgs_u3@g#)+z4o7r=^z'
+
+    DEBUG = True
 
 # Application definition
 
@@ -78,14 +86,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sam_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
+if PROD==False:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+       }
+    }
+else:
+    DATABASES = {
     'default': dj_database_url.parse(os.environ.get('DATABASE_URL'), conn_max_age=600),
-}
-
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

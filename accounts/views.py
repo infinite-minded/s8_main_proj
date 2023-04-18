@@ -75,7 +75,6 @@ class ContactModify(APIView):
             name = serializer.validated_data.get("name")
             number = serializer.validated_data.get("number")
             e = EmergencyContact(user=user, name=name, number=number)
-            print(user.email)
             e.save()
             return Response({"message": "Contact added"}, status=status.HTTP_200_OK)
         else:
