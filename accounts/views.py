@@ -69,7 +69,7 @@ class ContactModify(APIView):
     permission_classes(IsAuthenticated)
 
     def post(self, request):
-        user = User.objects.get(user=request.user)
+        user=request.user
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
             name = serializer.validated_data.get("name")
@@ -82,7 +82,7 @@ class ContactModify(APIView):
     
     def get(self, request):
         try:
-            user = User.objects.get(user=request.user)
+            user=request.user
         except ObjectDoesNotExist:
             return Response({"message": "User profile does not exist!"}, status=status.HTTP_404_NOT_FOUND)
         emergency_contacts = user.emergency_contacts.all()
