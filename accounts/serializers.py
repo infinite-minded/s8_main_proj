@@ -69,3 +69,6 @@ class ContactSerializer(serializers.ModelSerializer):
                 'required': True
             },
         }
+
+class SMS_Serializer(serializers.Serializer):
+    message = serializers.CharField(max_length=1000)

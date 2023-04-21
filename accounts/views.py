@@ -9,8 +9,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
 from accounts.models import User, EmergencyContact
-from .serializers import UserLoginSerializer, UserSerializer, ContactSerializer
+from .serializers import UserLoginSerializer, UserSerializer, ContactSerializer, SMS_Serializer
 
+import requests
 
 @api_view(["POST", ])
 @permission_classes([AllowAny, ])
@@ -34,6 +35,7 @@ def create_user_view(request):
             "message": "Account created",
             "email": user.email,
             "full_name": user.full_name,
+            'user_id': user.pk,
         },
         status=status.HTTP_201_CREATED
     )
@@ -90,3 +92,51 @@ class ContactModify(APIView):
         for phone in emergency_contacts:
             contact_list.append(phone.number)
         return Response(contact_list, status=status.HTTP_200_OK)
+
+class ContactDelete(APIView):
+
+    permission_classes(IsAuthenticated)
+
+    def post(self, request):
+        user=request.user
+        serializer = ContactSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data.get("name")
+            number = serializer.validated_data.get("number")
+            e = EmergencyContact.objects.filter(user=user, name=name, number=number)
+            if not e:
+                return Response({"message": "No such contact found!"}, status=status.HTTP_200_OK)
+            elif len(e) == 1:
+                obj = e[0]
+                obj.delete()
+                return Response({"message": "Contact removed"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Please provide all parameters for this request."}, status=status.HTTP_400_BAD_REQUEST)
+
+class EmergencySMS(APIView):
+
+    permission_classes(IsAuthenticated)
+
+    def post(self, request):
+        serializer = SMS_Serializer(data=request.data)
+        if serializer.is_valid():
+            message = serializer.validated_data.get("message")
+            mlist = message.split(";", 1)
+            userid = int(mlist[0])
+            msg = mlist[1]
+            user = User.objects.get(id=userid)
+            emergency_contacts = EmergencyContact.objects.filter(user=user)
+            contact_list = []
+            for phone in emergency_contacts:
+                contact_list.append(phone.number)
+            contacts = ",".join(contact_list)
+            url = "https://www.fast2sms.com/dev/bulkV2"
+            payload = f"sender_id=TXTIND&message={msg}&route=v3&numbers={contacts}"
+            headers = {'authorization': "Xu3AkvCBiSEaWVzUDsMmpQoqrc7TYJfhRPHK5njOIbtG4g2896c20ztN9MR6J8ObDqfQokplwiXKaPLH",
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Cache-Control': "no-cache",
+            }
+            response = requests.request("POST", url, data=payload, headers=headers)
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Please provide all parameters for this request."}, status=status.HTTP_400_BAD_REQUEST)
