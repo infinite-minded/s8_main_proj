@@ -88,9 +88,9 @@ class ContactModify(APIView):
         except ObjectDoesNotExist:
             return Response({"message": "User profile does not exist!"}, status=status.HTTP_404_NOT_FOUND)
         emergency_contacts = EmergencyContact.objects.filter(user=user)
-        contact_list = []
+        contact_list = {}
         for phone in emergency_contacts:
-            contact_list.append(phone.number)
+            contact_list[phone.name]=phone.number
         return Response(contact_list, status=status.HTTP_200_OK)
 
 class ContactDelete(APIView):
