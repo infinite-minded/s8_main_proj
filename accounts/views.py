@@ -129,8 +129,10 @@ class EmergencySMS(APIView):
             coords = coord.replace(" ", ", ")
             geolocator = GoogleV3(api_key='AIzaSyDDzP4oIcMhVdzWOJGsQWF3d0D7_csECaU')
             location = geolocator.reverse(coords)
-            msg = location.address
+            addr = location.address
             user = User.objects.get(id=userid)
+            name = user.full_name
+            msg = name + " has met with an accident!\n" + addr
             emergency_contacts = EmergencyContact.objects.filter(user=user)
             contact_list = []
             for phone in emergency_contacts:
