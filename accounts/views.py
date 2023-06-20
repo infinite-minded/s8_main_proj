@@ -13,6 +13,8 @@ from .serializers import UserLoginSerializer, UserSerializer, ContactSerializer,
 
 import requests
 
+from geopy.geocoders import GoogleV3
+
 @api_view(["POST", ])
 @permission_classes([AllowAny, ])
 def create_user_view(request):
@@ -123,7 +125,11 @@ class EmergencySMS(APIView):
             message = serializer.validated_data.get("message")
             mlist = message.split(";", 1)
             userid = int(mlist[0])
-            msg = mlist[1]
+            coord = mlist[1]
+            coords = coord.replace(" ", ", ")
+            geolocator = GoogleV3(api_key='AIzaSyDDzP4oIcMhVdzWOJGsQWF3d0D7_csECaU')
+            location = geolocator.reverse(coords)
+            msg = location.address
             user = User.objects.get(id=userid)
             emergency_contacts = EmergencyContact.objects.filter(user=user)
             contact_list = []
