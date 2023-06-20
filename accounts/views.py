@@ -132,7 +132,7 @@ class EmergencySMS(APIView):
             addr = location.address
             user = User.objects.get(id=userid)
             name = user.full_name
-            msg = name + " has met with an accident!\n" + addr
+            msg = "Accident - " + name + "\n\n" + addr
             emergency_contacts = EmergencyContact.objects.filter(user=user)
             contact_list = []
             for phone in emergency_contacts:
